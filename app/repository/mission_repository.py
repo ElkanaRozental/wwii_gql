@@ -1,6 +1,7 @@
 from typing import List
 
 from returns.maybe import Maybe, Nothing, Some
+from returns.result import Result, Success, Failure
 
 from app.db.database import session_maker
 from app.models import Mission, Target, Country
@@ -34,3 +35,15 @@ def get_mission_by_target_industry(target_industry) -> List[Maybe[Mission]]:
                     .filter(Mission.Target.target_industry == target_industry)
                     .all())
         return Some(missions) if missions else Nothing
+
+
+def create_mission(mission: Mission) -> Result[Mission, str]:
+    with session_maker() as session:
+        try:
+            session.add(mission)
+            session.commit()
+            session.refresh(mission)
+            return Success(mission)
+        except Exception as e:
+            session.rollback()
+            return Failure(str(e))

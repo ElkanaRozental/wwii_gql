@@ -16,9 +16,9 @@ class MissionType(ObjectType):
     aircraft_damaged = Float()
     aircraft_lost = Float()
 
-    targets = List('app.gql.types.target_type.TargetType')
-
-    @staticmethod
-    def resolve_target(root, info):
-        with session_maker() as session:
-            return session.query(Target).filter(Target.mission_id == root.id)
+    # targets = List('app.gql.types.target_type.TargetType')
+    #
+    # @staticmethod
+    # def resolve_target(root, info):
+    #     with session_maker() as session:
+    #         return session.query(Target).filter(Target.mission_id == root.id)
