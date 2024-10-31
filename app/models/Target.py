@@ -10,7 +10,7 @@ class Target(Base):
     target_industry = Column(String)
     target_priority = Column(Integer)
 
-    target_type_id = (Integer, ForeignKey('targettypes.target_type_id'))
+    target_type_id = Column(Integer, ForeignKey('targettypes.target_type_id'))
     city_id = Column(Integer, ForeignKey('cities.city_id'))
     mission_id = Column(Integer, ForeignKey('missions.mission_id'))
 
