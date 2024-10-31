@@ -2,7 +2,7 @@ from graphene import Mutation, Int, Date, Float, Field
 
 from app.gql.types.mission_type import MissionType
 from app.models import Mission
-from app.repository.mission_repository import create_mission
+from app.repository.mission_repository import create_mission, update_mission, delete_mission
 
 
 class AddMission(Mutation):
@@ -38,4 +38,42 @@ class AddMission(Mutation):
                           aircraft_damaged=aircraft_damaged,
                           aircraft_lost=aircraft_lost
                           )
-        return create_mission(mission)
+        return create_mission(mission).value_or(None)
+
+
+class UpdateMission(Mutation):
+    class Arguments:
+        aircraft_returned = Float()
+        aircraft_failed = Float()
+        aircraft_damaged = Float()
+        aircraft_lost = Float()
+
+        mission_id = Int()
+
+    mission = Field(MissionType)
+
+    @staticmethod
+    def mutate(root, info,
+               mission_id,
+               aircraft_returned,
+               aircraft_failed,
+               aircraft_damaged,
+               aircraft_lost):
+        mission = Mission(aircraft_returned=aircraft_returned,
+                          aircraft_failed=aircraft_failed,
+                          aircraft_damaged=aircraft_damaged,
+                          aircraft_lost=aircraft_lost
+                          )
+        return update_mission(mission_id, mission)
+
+
+class DeleteMission(Mutation):
+    class Arguments:
+        mission_id = Int()
+
+    mission = Field(MissionType)
+
+    @staticmethod
+    def mutate(root, info, mission_id):
+        return delete_mission(mission_id)
+

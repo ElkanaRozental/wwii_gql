@@ -10,7 +10,7 @@ from app.repository.target_repository import get_plains_by_target_type_name
 
 class Query(ObjectType):
     mission_by_date = List(MissionType, first_date=Date(), end_date=Date())
-    mission_by_id = List(MissionType, mission_id=Int())
+    mission_by_id = Field(MissionType, mission_id=Int())
     mission_by_industry = List(MissionType, industry=String())
     mission_by_country = List(MissionType, country=String())
     plains_by_target_type = List(TargetTypeType, target_type=String())
@@ -34,3 +34,17 @@ class Query(ObjectType):
     @staticmethod
     def resolve_plains_by_target_type(root, info, target_type):
         return get_plains_by_target_type_name(target_type)
+
+
+# class Query(ObjectType):
+#     get_missions = List(MissionType)
+#     get_mission = Field(MissionType, mission_id=Int())
+#     @staticmethod
+#     def resolve_get_missions(root, info):
+#         with session_maker() as session:
+#             return session.query(Mission).all()
+#
+#     @staticmethod
+#     def resolve_get_mission(root, info, mission_id):
+#         with session_maker() as session:
+#             return session.query(Mission).filter(Mission.mission_id == mission_id).first()
