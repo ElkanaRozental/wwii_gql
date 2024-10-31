@@ -1,4 +1,4 @@
-from graphene import Mutation, Int, Date, Float, Field
+from graphene import Mutation, Int, Date, Float, Field, Boolean
 
 from app.gql.types.mission_type import MissionType
 from app.models import Mission
@@ -7,7 +7,6 @@ from app.repository.mission_repository import create_mission, update_mission, de
 
 class AddMission(Mutation):
     class Arguments:
-        mission_id = Int()
         mission_date = Date()
         airborne_aircraft = Float()
         attacking_aircraft = Float()
@@ -29,16 +28,18 @@ class AddMission(Mutation):
                aircraft_failed,
                aircraft_damaged,
                aircraft_lost):
-        mission = Mission(mission_date=mission_date,
-                          airborne_aircraft=airborne_aircraft,
-                          attacking_aircraft=attacking_aircraft,
-                          bombing_aircraft=bombing_aircraft,
-                          aircraft_returned=aircraft_returned,
-                          aircraft_failed=aircraft_failed,
-                          aircraft_damaged=aircraft_damaged,
-                          aircraft_lost=aircraft_lost
+        mission_insert = Mission(
+                        mission_date=mission_date,
+                        airborne_aircraft=airborne_aircraft,
+                        attacking_aircraft=attacking_aircraft,
+                        bombing_aircraft=bombing_aircraft,
+                        aircraft_returned=aircraft_returned,
+                        aircraft_failed=aircraft_failed,
+                        aircraft_damaged=aircraft_damaged,
+                        aircraft_lost=aircraft_lost
                           )
-        return create_mission(mission).value_or(None)
+        create_mission(mission_insert)
+        return AddMission(mission=mission_insert)
 
 
 class UpdateMission(Mutation):
@@ -59,21 +60,24 @@ class UpdateMission(Mutation):
                aircraft_failed,
                aircraft_damaged,
                aircraft_lost):
-        mission = Mission(aircraft_returned=aircraft_returned,
-                          aircraft_failed=aircraft_failed,
-                          aircraft_damaged=aircraft_damaged,
-                          aircraft_lost=aircraft_lost
-                          )
-        return update_mission(mission_id, mission)
+        mission_update = Mission(
+                        aircraft_returned=aircraft_returned,
+                        aircraft_failed=aircraft_failed,
+                        aircraft_damaged=aircraft_damaged,
+                        aircraft_lost=aircraft_lost
+                        )
+        res = update_mission(mission_id, mission_update).value_or(None)
+        return UpdateMission(mission=res)
 
 
 class DeleteMission(Mutation):
     class Arguments:
         mission_id = Int()
 
-    mission = Field(MissionType)
+    success = Field(Boolean)
 
     @staticmethod
     def mutate(root, info, mission_id):
-        return delete_mission(mission_id)
+        delete_mission(mission_id)
+        return DeleteMission(success=True)
 

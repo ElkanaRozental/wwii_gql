@@ -23,9 +23,10 @@ class AddTarget(Mutation):
                target_type_id,
                city_id,
                mission_id):
-        target = Target(target_industry=target_industry,
+        target_insert = Target(target_industry=target_industry,
                         target_priority=target_priority,
                         target_type_id=target_type_id,
                         city_id=city_id,
                         mission_id=mission_id)
-        return create_target(target).value_or(None)
+        create_target(target_insert)
+        return AddTarget(target=target_insert)

@@ -16,8 +16,8 @@ def get_mission_by_id(mission_id) -> Maybe[Mission]:
 def get_mission_type_name(target_type) -> List[Mission]:
     with session_maker() as session:
         missions = (session.query(Mission)
-                    .join(Mission.targets)
-                    .join(Target.target_type)
+                    .join(Target)
+                    .join(TargetType)
                     .filter(TargetType.target_type_name == target_type)
                     .all())
         return missions
@@ -57,7 +57,7 @@ def create_mission(mission: Mission) -> Result[Mission, str]:
             session.add(mission)
             session.commit()
             session.refresh(mission)
-            return Success(mission).value_or(None)
+            return Success(mission)
         except Exception as e:
             session.rollback()
             return Failure(str(e))
@@ -71,8 +71,13 @@ def update_mission(mission_id, mission: Mission) -> Result[Mission, str]:
             mission_to_update.aircraft_lost = mission.aircraft_lost
             mission_to_update.aircraft_damaged = mission.aircraft_damaged
             mission_to_update.aircraft_failed = mission.aircraft_failed
+            mission_to_update.mission_date = mission_to_update.mission_date
+            mission_to_update.attacking_aircraft = mission_to_update.attacking_aircraft
+            mission_to_update.bombing_aircraft = mission_to_update.bombing_aircraft
+            mission_to_update.airborne_aircraft = mission_to_update.airborne_aircraft
             session.commit()
-            return Success(mission_to_update).value_or(None)
+            session.refresh(mission_to_update)
+            return Success(mission_to_update)
         except Exception as e:
             session.rollback()
             return Failure(str(e))
