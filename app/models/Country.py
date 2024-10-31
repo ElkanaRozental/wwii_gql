@@ -10,3 +10,4 @@ class Country(Base):
     country_name = Column(String, nullable=False)
 
     cities = relationship("City", back_populates='country')
+

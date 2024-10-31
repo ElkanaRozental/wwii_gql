@@ -1,41 +1,39 @@
-from graphene import ObjectType, List, Field, Int
+from graphene import ObjectType, List, Field, Int, Date, String
 
-from app.gql.types.city_type import AddressType
-from app.gql.types.country_type import CreditcardType
-from app.gql.types.target_type import UserType
-from app.repository.address_repository import get_all_addresses, get_address_by_id
-from app.repository.creditcard_repository import get_all_cards, get_card_by_id
-from app.repository.user_repository import get_all_users, get_user_by_id
+from app.gql.types.mission_type import MissionType
+from app.gql.types.targettype_type import TargetTypeType
+
+from app.repository.mission_repository import get_mission_by_id, get_mission_between_date, \
+    get_mission_by_target_industry, get_mission_by_country_name
+from app.repository.target_repository import get_plains_by_target_type_name
 
 
 class Query(ObjectType):
-    users = List(UserType)
-    credit_cards = List(CreditcardType)
-    addresses = List(AddressType)
-    user_by_id = Field(UserType, user_id=Int())
-    card_by_id = Field(CreditcardType, user_id=Int())
-    address_by_id = Field(AddressType, user_id=Int())
+    mission_by_date = List(MissionType, first_date=Date(), end_date=Date())
+    mission_by_id = List(MissionType,  mission_id=Int())
+    mission_by_industry = List(MissionType, industry=String())
+    mission_by_country = List(MissionType, country=String())
+    plains_by_target_type = List(TargetTypeType, target_type=String())
+
+
+
 
     @staticmethod
-    def resolve_users(root, info):
-        return get_all_users()
+    def resolve_mission_by_id(root, info, mission_id):
+        return get_mission_by_id(mission_id).value_or(None)
 
     @staticmethod
-    def resolve_credit_cards(root, info):
-        return get_all_cards()
+    def resolve_mission_by_date(root, info, first_date, end_date):
+        return get_mission_between_date(first_date, end_date)
 
     @staticmethod
-    def resolve_addresses(root, info):
-        return get_all_addresses()
+    def resolve_mission_by_industry(root, info, industry):
+        return get_mission_by_target_industry(industry)
 
     @staticmethod
-    def resolve_user_by_id(root, info, user_id):
-        return get_user_by_id(user_id).value_or(None)
+    def resolve_mission_by_country(root, info, country):
+        return get_mission_by_country_name(country)
 
     @staticmethod
-    def resolve_card_by_id(root, info, card_id):
-        return get_card_by_id(card_id)
-
-    @staticmethod
-    def resolve_address_by_id(root, info, address_id):
-        return get_address_by_id(address_id)
+    def resolve_plains_by_target_type(root, info, target_type):
+        return get_plains_by_target_type_name(target_type)

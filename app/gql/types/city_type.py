@@ -1,4 +1,7 @@
-from graphene import ObjectType, Int, String, Field, Float
+from graphene import ObjectType, Int, String, Field, Float, List
+
+from app.db.database import session_maker
+from app.models import Target
 
 
 class CityType(ObjectType):
@@ -7,11 +10,10 @@ class CityType(ObjectType):
     latitude = Float()
     longitude = Float()
 
+    targets = List('app.gql.types.target_type.TargetType')
 
-    # user_id = Int()
-    # user = Field("app.gql.types.user_type.UserType")
-    #
-    # @staticmethod
-    # def resolve_user(root, info):
-    #     with session_maker() as session:
-    #         return session.query(UserDetails).filter(UserDetails.id == root.user_id).first()
+    @staticmethod
+    def resolve_target(root, info):
+        with session_maker() as session:
+            return session.query(Target).filter(Target.city_id == root.id)
+

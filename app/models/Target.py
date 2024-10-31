@@ -10,9 +10,9 @@ class Target(Base):
     target_industry = Column(String)
     target_priority = Column(Integer)
 
-    target_type_id = (Integer, ForeignKey('target_types.id'))
-    city_id = Column(Integer, ForeignKey('cities.id'))
-    mission_id = Column(Integer, ForeignKey('missions.id'))
+    target_type_id = (Integer, ForeignKey('target_types.target_type_id'))
+    city_id = Column(Integer, ForeignKey('cities.city_id'))
+    mission_id = Column(Integer, ForeignKey('missions.mission_id'))
 
     mission = relationship("Mission", back_populates='targets')
     target_type = relationship("TargetType", back_populates='target')
